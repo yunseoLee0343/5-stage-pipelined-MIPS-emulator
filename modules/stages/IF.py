@@ -1,6 +1,6 @@
 from models.instruction import Instruction
 
-def if_stage(self, shred, log):
+def if_stage(shred, log):
     if shred.pc < len(shred.instruction_memory):
         # Write data to instruction memory
         instruction = Instruction()
@@ -14,6 +14,7 @@ def if_stage(self, shred, log):
         shred.pc += 1
         shred.cycle += 1
         #
+        print("IF Stage: Instruction ", shred.pc, " - ", instruction.value, "\n")
         entry = f"IF Stage: Instruction {shred.pc} - {instruction.value}\n"
         log.write(entry)
 

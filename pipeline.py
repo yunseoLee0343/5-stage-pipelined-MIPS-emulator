@@ -1,5 +1,5 @@
 from collections import deque
-from models.latch import ID_EX_Latch, IF_ID_Latch, Latch
+from models.latch import EX_MEM_Latch, ID_EX_Latch, IF_ID_Latch, Latch, MEM_WB_Latch
 from modules.stages.EX import ex_stage
 from modules.stages.ID import id_stage
 from modules.stages.IF import if_stage
@@ -14,8 +14,8 @@ class Pipeline:
 
         self.if_id_latch = IF_ID_Latch()
         self.id_ex_latch = ID_EX_Latch()
-        self.ex_mem_latch = Latch()
-        self.mem_wb_latch = Latch()
+        self.ex_mem_latch = EX_MEM_Latch()
+        self.mem_wb_latch = MEM_WB_Latch()
 
     def process_stage(self, index, shred, log):
         if index == 0:
@@ -30,6 +30,7 @@ class Pipeline:
             mem_stage(shred, log)
         elif index == 4:
             wb_stage(shred, log)
+        # print("Instruction: ", shred.instruction_memory[index].value, "Stage: ", shred.instruction_memory[index].stage)
         shred.instruction_memory[index].stage += 1
 
     def run(self, shred):
@@ -59,7 +60,7 @@ class Pipeline:
 
                 # Fetch new instruction
                 if shred.pc < len(instruction_memory) and not self.pipeline[0]:
-                    self.pipeline[0] = self.if_stage(shred, log)
+                    self.pipeline[0] = if_stage(shred, log)
                 
                 shred.cycle += 1
 

@@ -1,5 +1,5 @@
 import struct
-from global import GlobalVariables
+from my_global import GlobalVariables
 from pipeline import Pipeline
 
 def load_instructions(shred, input_file, log_file):

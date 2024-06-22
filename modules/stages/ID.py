@@ -1,5 +1,5 @@
 
-def id_stage(self, shred, log):
+def id_stage(shred, log):
         # Get the instruction from the IF/ID latch
         instruction = shred.if_id_latch.instruction
         instruction.stage += 1
@@ -7,11 +7,11 @@ def id_stage(self, shred, log):
         if instruction is not None:
             # Decode the instruction
             sign_extend_flag = 0
-            decoded_instruction, sign_extend_flag = decode_instruction(instruction, shred, log)
+            decoded_instruction, sign_extend_flag = decode_instruction(instruction.value, shred, log)
 
             # Write data to ID/EX latch
             shred.id_ex_latch.instruction = instruction
-            shred.id_ex_latch.instruction = decoded_instruction
+            shred.id_ex_latch.decoded_instruction = decoded_instruction
             shred.id_ex_latch.pc = shred.if_id_latch.pc
             shred.id_ex_latch.sign_extend_flag = sign_extend_flag
             #
@@ -130,7 +130,7 @@ def decode_instruction(raw_instruction, shred, log_file):
     if raw_instruction is None:
         return None, None, sign_extend_flag
     
-    instruction = raw_instruction.value
+    instruction = raw_instruction
     # Extract opcode and other fields
     opcode = (instruction >> 26) & 0b111111
     rs = (instruction >> 21) & 0b11111

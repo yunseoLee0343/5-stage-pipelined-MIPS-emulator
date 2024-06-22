@@ -1,10 +1,12 @@
 def ex_stage(shred, log_file):
-    instruction = shred.id_ex_latch.decoded_instruction
+    instruction = shred.id_ex_latch.instruction
     decoded_instruction = shred.id_ex_latch.decoded_instruction
 
+    print("instuction: ", instruction.value, "\n decoded_instruction: ", decoded_instruction)
+
     result = None
-    opcode = instruction['opcode']
-    alu_control_signal = instruction['control_signals']['ALUOp']
+    opcode = decoded_instruction['opcode']
+    alu_control_signal = decoded_instruction['control_signals']
 
     if alu_control_signal == 0:  # R type operations
         execute_register_register(decoded_instruction, shred.registers)
@@ -53,6 +55,8 @@ def execute_register_immediate(instruction, registers):
     imm = instruction['imm']
 
     if instruction['opcode'] == 8:  # ADDI
+        return rs_value + imm
+    elif instruction['opcode'] == 9:  # ADDIU
         return rs_value + imm
     elif instruction['opcode'] == 10:  # SLTI
         return 1 if rs_value < imm else 0

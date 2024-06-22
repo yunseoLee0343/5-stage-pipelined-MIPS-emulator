@@ -1,0 +1,18 @@
+
+Clock Cycle 0: (idx, stage)
+
+Clock Cycle 1: [None, None, None, None, None]
+IF Stage: Instruction 1 - 666763256
+
+Clock Cycle 2: [(0, 1), None, None, None, None]
+IF Stage: Instruction 2 - 2948464644
+IF Stage: Instruction 3 - 60878881
+
+Clock Cycle 3: [(2, 1), (1, 1), None, None, None]
+ID Stage: Instruction 2 - (2, 2)
+~ Opcode: 0x0, rs: 0x1d, rt: 0x0, rd: 0x1e, funct: 0x21, imm: 0xf021, jump_address: 0x3a0f021, Control Signals: {'ALUSrc': 1, 'ALUOp': 33, 'RegDst': 1, 'MemWrite': 0, 'MemRead': 0, 'MemToReg': 0, 'RegWrite': 1, 'Jump': 0, 'Branch': 0}
+ID Stage: Instruction 2 - (2, 2)
+IF Stage: Instruction 4 - 0
+IF Stage: Instruction 5 - 62973985
+
+Clock Cycle 4: [(4, 1), (3, 1), (1, 2), None, None]

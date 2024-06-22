@@ -1,5 +1,5 @@
 from models.instruction import Instruction
-from models.latch import EX_MEM_Latch, ID_EX_Latch, IF_ID_Latch, Latch, MEM_WB_Latch
+from models.latch import EX_MEM_Latch, ID_EX_Latch, IF_ID_Latch, MEM_WB_Latch
 
 class GlobalVariables:
     pc = 0
