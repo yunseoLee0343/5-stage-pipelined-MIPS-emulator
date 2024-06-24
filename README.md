@@ -6,6 +6,48 @@ This project involves the development of a five-stage pipelined MIPS emulator us
 
 - Test Codes: <[https://github.com/yunseoLee0343/5-stage-pipelined-MIPS-emulator.git/tests](https://github.com/yunseoLee0343/5-stage-pipelined-MIPS-emulator/tree/7b7359778913838d83b205742c17a6b25cb8aad7/tests)>
 
+# Table of contents
+
+- [5 Staged Pipelined MIPS Emulator](#5-staged-pipelined-mips-emulator)
+    - [Abstract](#abstract)
+    - [Topic 1: Pipelining](#topic-1-pipelining)
+        - [1. Maintaining Stage Sequence](#1-maintaining-stage-sequence)
+          - [Part 1. My Implementation](#part-1-my-implementation)
+          - [Part 2. QEMU Implementation](#part-2-qemu-implementation)
+          - [Part 3. My code improved by referring to QEMU](#part-3-my-code-improved-by-referring-to-qemu)
+        - [2. Independence Between Stages](#2-independence-between-stages)
+          - [Part 1. My Implementation](#part-1-my-implementation)
+          - [Part 2. QEMU Implementation**](#part-2-qemu-implementation)
+        - [3. Instruction Overlapping](#3-instruction-overlapping)
+          - [Part 1. My Implementation](#part-1-my-implementation)
+    - [Topic 2: Hazard](#topic-2-hazard)
+      - [1. Control Hazard](#1-control-hazard)
+      - [2. Data Hazard](#2-data-hazard)
+    - [Topic 3: Detecting Hazard](#topic-3-detecting-hazard)
+      - [1. Control Hazard: isBranch, isTaken](#1-control-hazard-isbranch-istaken)
+      - [2. Data Hazard: (Rs or Rt) and RegWrite](#2-data-hazard-rs-or-rt-and-regwrite)
+      - [1. Data Hazard](#1-data-hazard)
+    - [Topic 4: Data Hazard in Detail, how can minimize?](#topic-4-data-hazard-in-detail-how-can-minimize)
+      - [1. Stall using scoreboarding.](#1-stall-using-scoreboarding)
+      - [2. Data Forwarding (Bypassing)](#2-data-forwarding-bypassing)
+      - [1. Stall using scoreboarding.](#1-stall-using-scoreboarding)
+    - [Topic 4: Control Hazard in Detail, how can minimize?](#topic-4-control-hazard-in-detail-how-can-minimize)
+      - [1. Simply Stalling](#1-simply-stalling)
+      - [2. Stalling makes more execution time.](#2-stalling-makes-more-execution-time)
+    - [Sol1. Minimize control-related instructions](#sol1-minimize-control-related-instructions)
+      - [1. Just guessing nextPC = PC + 4](#1-just-guessing-nextpc--pc--4)
+      - [2. Predicate Combining](#2-predicate-combining)
+      - [3. Predicated Execution](#3-predicated-execution)
+      - [2. Predicate Combining](#2-predicate-combining)
+    - [Sol2. Delayed Branching](#sol2-delayed-branching)
+      - [1. Inserting nop.](#1-inserting-nop)
+      - [2. Reordering, filling branch delay slot.](#2-reordering-filling-branch-delay-slot)
+    - [Misprediction Penalty](#misprediction-penalty)
+    - [Sol3. Static Branch Prediction](#sol3-static-branch-prediction)
+    - [Sol4. Dynamic Branch Prediction](#sol4-dynamic-branch-prediction)
+  - [Conclusion](#conclusion)
+
+
 ### Topic 1: Pipelining
 
 ![](docs/assets/Aspose.Words.db74fd64-4fc5-4662-9ad1-efd722149e28.001.png)
