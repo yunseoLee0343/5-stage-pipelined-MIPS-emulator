@@ -1,25 +1,64 @@
 
+def isBranch(opcode):
+    return opcode in [2, 3, 4, 5]  # j, jal, beq, bne
+
+def detect_data_hazard(rs, rt, shred):
+    # Check EX stage
+    if shred.ex_mem_latch.instruction is not None:
+        ex_decoded_instruction = shred.ex_mem_latch.decoded_instruction
+        if ex_decoded_instruction['control_signals']['RegWrite']:
+            ex_rd = ex_decoded_instruction['rd']
+            if rs == ex_rd or rt == ex_rd:
+                return True
+
+    # Check MEM stage
+    if shred.mem_wb_latch.instruction is not None:
+        mem_decoded_instruction = shred.mem_wb_latch.decoded_instruction
+        if mem_decoded_instruction['control_signals']['RegWrite']:
+            mem_rd = mem_decoded_instruction['rd']
+            if rs == mem_rd or rt == mem_rd:
+                return True
+
+    return False
+
 def id_stage(shred, log):
-        # Get the instruction from the IF/ID latch
-        instruction = shred.if_id_latch.instruction
+    # Get the instruction from the IF/ID latch
+    instruction = shred.if_id_latch.instruction
+    if instruction is not None:
         instruction.stage += 1
 
-        if instruction is not None:
-            # Decode the instruction
-            sign_extend_flag = 0
-            decoded_instruction, sign_extend_flag = decode_instruction(instruction.value, shred, log)
+        # Decode the instruction
+        sign_extend_flag = 0
+        decoded_instruction, sign_extend_flag = decode_instruction(instruction.value, shred, log)
 
-            # Write data to ID/EX latch
-            shred.id_ex_latch.instruction = instruction
-            shred.id_ex_latch.decoded_instruction = decoded_instruction
-            shred.id_ex_latch.pc = shred.if_id_latch.pc
-            shred.id_ex_latch.sign_extend_flag = sign_extend_flag
-            #
-            entry = f"ID Stage: Instruction {shred.pc - 1} - {shred.raw_instruction_memory[shred.pc - 1]}\n"
-            log.write(entry)
+        # Check for control hazards
+        if isBranch(decoded_instruction['opcode']):
+            log.write(f"ID Stage: Detected control hazard for instruction {instruction.value}\n")
+            shred.stall = True  # Set stall signal
         else:
-            shred.id_ex_latch.flush()
-        shred.cycle += 1
+            shred.stall = False
+
+        # Check for data hazards
+        rs = decoded_instruction['rs']
+        rt = decoded_instruction['rt']
+
+        if detect_data_hazard(rs, rt, shred):
+            log.write(f"ID Stage: Detected data hazard for instruction {instruction.value}\n")
+            shred.stall = True  # Set stall signal
+        else:
+            shred.stall = False
+
+        # Write data to ID/EX latch
+        shred.id_ex_latch.instruction = instruction
+        shred.id_ex_latch.decoded_instruction = decoded_instruction
+        shred.id_ex_latch.pc = shred.if_id_latch.pc
+        shred.id_ex_latch.sign_extend_flag = sign_extend_flag
+
+        entry = f"ID Stage: Instruction {shred.pc - 1} - {shred.raw_instruction_memory[shred.pc - 1]}\n"
+        log.write(entry)
+    else:
+        shred.id_ex_latch.flush()
+    shred.cycle += 1
 
 def is_negative(number, identifier):
     return (number >> identifier) & 1 == 1

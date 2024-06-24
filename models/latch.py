@@ -32,12 +32,14 @@ class EX_MEM_Latch(Latch):
         self.result = None
         self.pc = None
         self.sign_extend_flag = None
+        self.isTaken = False
     
     def flush(self):
         super().flush()
         self.result = None
         self.pc = None
         self.sign_extend_flag = None
+        self.isTaken = False
 
 class MEM_WB_Latch(Latch):
     def __init__(self):

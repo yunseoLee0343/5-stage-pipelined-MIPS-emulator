@@ -52,16 +52,29 @@ class Pipeline:
                         else:
                             self.process_stage(i, shred, log)
 
-                # Move instructions to the next stage
-                for i in range(len(self.stages) - 1, 0, -1):
-                    if not self.pipeline[i]:
-                        self.pipeline[i] = self.pipeline[i - 1]
-                        self.pipeline[i - 1] = None
+                # Check for control hazards
+                if self.ex_mem_latch.isBranch and self.ex_mem_latch.isTaken:
+                    log.write(f"Pipeline stalled due to control hazard at clock cycle {self.clock}\n")
+                    shred.pc = self.ex_mem_latch.result  # Update PC to the branch target
+                    shred.stall = True
+                    # Clear the pipeline stages
+                    self.pipeline[0] = None
+                    self.pipeline[1] = None
+                    self.pipeline[2] = None
+                else:
+                    shred.stall = False
 
-                # Fetch new instruction
-                if shred.pc < len(instruction_memory) and not self.pipeline[0]:
-                    self.pipeline[0] = if_stage(shred, log)
-                
+                # Move instructions to the next stage if no stall
+                if not shred.stall:
+                    for i in range(len(self.stages) - 1, 0, -1):
+                        if not self.pipeline[i]:
+                            self.pipeline[i] = self.pipeline[i - 1]
+                            self.pipeline[i - 1] = None
+
+                    # Fetch new instruction if IF stage is empty
+                    if self.pipeline[0] is None and shred.pc < len(shred.instruction_memory):
+                        self.pipeline[0] = if_stage(shred, log)
+
                 shred.cycle += 1
 
             log.write(f"\nFinal State at Clock Cycle {self.clock}: {list(self.pipeline)}\n")

@@ -10,6 +10,7 @@ class GlobalVariables:
     instruction_memory = [Instruction() for i in range(100)]
     data_memory = [0] * 1000
     registers = [0] * 32
+    stall = False
     
     if_id_latch = IF_ID_Latch()
     id_ex_latch = ID_EX_Latch()

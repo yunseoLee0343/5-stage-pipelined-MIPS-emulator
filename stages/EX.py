@@ -7,6 +7,7 @@ def ex_stage(shred, log_file):
     result = None
     opcode = decoded_instruction['opcode']
     alu_control_signal = decoded_instruction['control_signals']
+    isTaken = False  # Initialize isTaken flag for branch instructions
 
     if alu_control_signal == 0:  # R type operations
         execute_register_register(decoded_instruction, shred.registers)
@@ -24,6 +25,7 @@ def ex_stage(shred, log_file):
     shred.ex_mem_latch.result = result
     shred.ex_mem_latch.pc = shred.id_ex_latch.pc
     shred.ex_mem_latch.sign_extend_flag = shred.id_ex_latch.sign_extend_flag
+    shred.ex_mem_latch.isTaken = isTaken  # Store isTaken flag in the latch
     #
     log_entry = f"EX Stage: Instruction {shred.pc - 1} - {shred.raw_instruction_memory[shred.pc - 1]}\n"
     log_file.write(log_entry)
@@ -74,10 +76,16 @@ def execute_branch(instruction, registers):
     rt_value = registers[instruction['rt']]
     offset = instruction['imm'] << 2  # Shift the offset to the left by 2 bits for branch target
 
-    if rs_value == rt_value:
-        return offset
+    isTaken = False
+    if instruction['opcode'] == 4:  # beq
+        isTaken = rs_value == rt_value
+    elif instruction['opcode'] == 5:  # bne
+        isTaken = rs_value != rt_value
+
+    if isTaken:
+        return offset, True
     else:
-        return None  # No branch taken
+        return None, False  # No branch taken
 
 def execute_jump(instruction):
     return instruction['jump_address']
